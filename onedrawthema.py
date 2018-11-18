@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/local/bin python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -27,7 +27,7 @@ def get_tweetdata():
     # ツイート取得(@kancolle_1drawユーザーの投稿内容を取得する)
     tweet_data = []
     for tweet in tweepy.Cursor(api.user_timeline,screen_name = "kancolle_1draw",exclude_replies = True).items():
-        tweet_data.append([tweet.id,tweet.created_at,tweet.text.replace('\n',''),tweet.favorite_count,tweet.retweet_count])
+        tweet_data.append([tweet.id, tweet.created_at, tweet.text.replace('\n',''),tweet.favorite_count, tweet.retweet_count])
 
     # テンポラリCSV出力
     with open(temp_file_name, 'w',newline='',encoding='utf-8') as f:
