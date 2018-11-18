@@ -7,7 +7,7 @@
         <key>ProgramArguments</key>
         <array>
             <string>sh</string>
-            <string>/Users/hogeuser/kancolle_pic_class/shiplist.sh</string>
+            <string>/Users/hogeuser/cron/shiplist.sh</string>
         </array>
         <key>LowPriorityIO</key>
         <true/>
