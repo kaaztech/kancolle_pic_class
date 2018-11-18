@@ -1,10 +1,27 @@
-# 特定の拡張子を無視
+# kancolle onedraw pic class application
+
 *.csv
 *.db
+
+# vim
+
 *.swp
 
-# 特定のファイルを無視
+# Mac
+
 .DS_Store
 
-# 特定のディレクトリを無視
+# pyenv
+
 /venv/
+
+# Django
+
+*.log
+*.pot
+*.py[cod]
+__pycache__/
+local_settings.py
+staticfiles
+.env
+db.sqlite3
