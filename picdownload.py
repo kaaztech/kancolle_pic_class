@@ -1,5 +1,6 @@
 # -*- coding: utf_8 -*- 
 
+import argparse
 import os
 import tweepy
 import urllib.request
@@ -81,6 +82,16 @@ class ImageDownloader(object):
 
 def main():
     print("main")
+
+    parser = argparse.ArgumentParser(
+                        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('date', help='onedraw date')
+    parser.add_argument('--debug', type=str, default='false',
+                        help='debug switch')
+    parser.add_argument('--clean', type=str, default='false',
+                        help='clean switch')
+    args = parser.parse_args()
+
     os.makedirs(IMAGES_DIR, exist_ok=True)
     try:
         downloader = ImageDownloader()
