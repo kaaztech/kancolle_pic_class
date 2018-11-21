@@ -14,11 +14,6 @@ CONSUMER_SECRET     = os.environ.get('TWITTER_CONSUMER_SECRET')
 ACCESS_TOKEN_KEY    = os.environ.get('TWITTER_ACCESS_TOKEN_KEY')
 ACCESS_TOKEN_SECRET = os.environ.get('TWITTER_ACCESS_TOKEN_SECRET')
 
-print(CONSUMER_KEY)
-print(CONSUMER_SECRET)
-print(ACCESS_TOKEN_KEY)
-print(ACCESS_TOKEN_SECRET)
-
 #= Search Key Word
 KEYWORDS = ['#艦これ版深夜の真剣お絵描き60分一本勝負']
 
@@ -47,10 +42,6 @@ class ImageDownloader(object):
     def set_twitter_api(self):
         print("ImageDownloader.set_twitter_api")
         try:
-            print(CONSUMER_KEY)
-            print(CONSUMER_SECRET)
-            print(ACCESS_TOKEN_KEY)
-            print(ACCESS_TOKEN_SECRET)
             auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
             auth.set_access_token(ACCESS_TOKEN_KEY, ACCESS_TOKEN_SECRET)
             self.api = tweepy.API(auth)
