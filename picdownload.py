@@ -23,11 +23,19 @@ RETURN_PAR_PAGE = 1000
 NUMBER_OF_PAGES = 100
 
 class ImageDownloader(object):
-    def __init__(self):
+    image_directory = IMAGES_DIR
+
+    def __init__(self, date):
         print("ImageDownloader.__init__")
         super(ImageDownloader, self).__init__()
         self.set_twitter_api()
         self.media_url_list = []
+        self.image_directory = IMAGES_DIR + date + '/'
+        self.make_directory()
+
+    def make_directory(self):
+        print("ImageDownloader.make_directory")
+        os.makedirs(self.image_directory, exist_ok = True)
 
     def run(self):
         print("ImageDownloader.run")
@@ -94,7 +102,7 @@ def main():
 
     os.makedirs(IMAGES_DIR, exist_ok=True)
     try:
-        downloader = ImageDownloader()
+        downloader = ImageDownloader(args.date)
         downloader.run()
     except KeyboardInterrupt:
         pass
