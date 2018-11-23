@@ -16,7 +16,8 @@ ACCESS_TOKEN_KEY    = os.environ.get('TWITTER_ACCESS_TOKEN_KEY')
 ACCESS_TOKEN_SECRET = os.environ.get('TWITTER_ACCESS_TOKEN_SECRET')
 
 #= Search Key Word
-HASHTAG_BASE = '#艦これ版深夜の真剣お絵描き60分一本勝負'
+#HASHTAG_BASE = '#艦これ版深夜の真剣お絵描き60分一本勝負'
+HASHTAG_BASE = '#艦これ版深夜の真剣お絵描き60分一本勝負_20180101'
 
 #= 検索オプション
 RETURN_PAR_PAGE = 1000
@@ -65,17 +66,18 @@ class ImageDownloader(object):
         print("ImageDownloader.search()")
         try:
             if self.max_id:
-                search_result = self.api.search(q=term, rpp=rpp, max_id=self.max_id)
+                search_result = self.api.search(q = term, lang = 'ja', rpp = rpp, max_id = self.max_id)
             else:
-                search_result = self.api.search(q=term, rpp=rpp)
-            for result in search_result:
-                if 'media' in result.entities:
-                    for media in result.entities['media']:
-                        url = media['media_url_https']
-                        if url not in self.media_url_list:
-                            self.media_url_list.append(url)
-                            self.download_url_list.append(url)
-            self.max_id = result.id
+                search_result = self.api.search(q = term, lang = 'ja', rpp = rpp)
+            if search_result:
+                for result in search_result:
+                    if 'media' in result.entities:
+                        for media in result.entities['media']:
+                            url = media['media_url_https']
+                            if url not in self.media_url_list:
+                                self.media_url_list.append(url)
+                                self.download_url_list.append(url)
+                self.max_id = result.id
         except Exception as e:
             print("[-] Error: ", e)
 
