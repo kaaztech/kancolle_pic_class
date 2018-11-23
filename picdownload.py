@@ -23,34 +23,36 @@ RETURN_PAR_PAGE = 1000
 NUMBER_OF_PAGES = 100
 
 class ImageDownloader(object):
+    date            = ''
     image_directory = IMAGES_DIR
-    KEYWORDS = [HASHTAG_BASE]
+    hashtag         = ''
 
-    def __init__(self, date):
-        print("ImageDownloader.__init__")
+    def __init__(self, date, image_directory, hashtag):
+        print("ImageDownloader.__init__()")
         super(ImageDownloader, self).__init__()
         self.set_twitter_api()
-        self.media_url_list = []
-        self.image_directory = IMAGES_DIR + date + '/'
+        self.media_url_list  = []
+        self.date            = date
+        self.image_directory = image_directory
+        self.hashtag         = hashtag
         self.make_directory()
 
     def make_directory(self):
-        print("ImageDownloader.make_directory")
+        print("ImageDownloader.make_directory()")
         os.makedirs(self.image_directory, exist_ok = True)
 
     def run(self):
-        print("ImageDownloader.run")
-        for keyword in self.KEYWORDS:
-            self.max_id = None
-            for page in range(NUMBER_OF_PAGES):
-                self.download_url_list = []
-                self.search(keyword, RETURN_PAR_PAGE)
-                for url in self.download_url_list:
-                    print(url)
-                    self.download(url)
+        print("ImageDownloader.run()")
+        self.max_id = None
+        for page in range(NUMBER_OF_PAGES):
+            self.download_url_list = []
+            self.search(self.hashtag, RETURN_PAR_PAGE)
+            for url in self.download_url_list:
+                print(url)
+                self.download(url)
 
     def set_twitter_api(self):
-        print("ImageDownloader.set_twitter_api")
+        print("ImageDownloader.set_twitter_api()")
         try:
             auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
             auth.set_access_token(ACCESS_TOKEN_KEY, ACCESS_TOKEN_SECRET)
@@ -60,7 +62,7 @@ class ImageDownloader(object):
             self.api = None
 
     def search(self, term, rpp):
-        print("ImageDownloader.search")
+        print("ImageDownloader.search()")
         try:
             if self.max_id:
                 search_result = self.api.search(q=term, rpp=rpp, max_id=self.max_id)
@@ -78,7 +80,7 @@ class ImageDownloader(object):
             print("[-] Error: ", e)
 
     def download(self, url):
-        print("ImageDownloader.download")
+        print("ImageDownloader.download()")
         url_orig = '%s:orig' % url
         filename = url.split('/')[-1]
         savepath = self.image_directory + filename
@@ -90,7 +92,7 @@ class ImageDownloader(object):
             print("[-] Error: ", e)
 
 def main():
-    print("main")
+    print("main()")
 
     parser = argparse.ArgumentParser(
                         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -101,9 +103,11 @@ def main():
                         help='clean switch')
     args = parser.parse_args()
 
-    os.makedirs(IMAGES_DIR, exist_ok=True)
     try:
-        downloader = ImageDownloader(args.date)
+        #hashtag = HASHTAG_BASE + '_' + args.date
+        hashtag = HASHTAG_BASE
+        image_directory = IMAGES_DIR + args.date + '/'
+        downloader = ImageDownloader(args.date, image_directory, hashtag)
         downloader.run()
     except KeyboardInterrupt:
         pass
