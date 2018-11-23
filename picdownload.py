@@ -16,7 +16,7 @@ ACCESS_TOKEN_KEY    = os.environ.get('TWITTER_ACCESS_TOKEN_KEY')
 ACCESS_TOKEN_SECRET = os.environ.get('TWITTER_ACCESS_TOKEN_SECRET')
 
 #= Search Key Word
-KEYWORDS = ['#艦これ版深夜の真剣お絵描き60分一本勝負']
+HASHTAG_BASE = '#艦これ版深夜の真剣お絵描き60分一本勝負'
 
 #= 検索オプション
 RETURN_PAR_PAGE = 1000
@@ -24,6 +24,7 @@ NUMBER_OF_PAGES = 100
 
 class ImageDownloader(object):
     image_directory = IMAGES_DIR
+    KEYWORDS = [HASHTAG_BASE]
 
     def __init__(self, date):
         print("ImageDownloader.__init__")
@@ -39,7 +40,7 @@ class ImageDownloader(object):
 
     def run(self):
         print("ImageDownloader.run")
-        for keyword in KEYWORDS:
+        for keyword in self.KEYWORDS:
             self.max_id = None
             for page in range(NUMBER_OF_PAGES):
                 self.download_url_list = []
