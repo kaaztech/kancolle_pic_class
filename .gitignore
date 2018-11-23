@@ -1,7 +1,10 @@
 # kancolle onedraw pic class application
 
+# application output
+
 *.csv
 *.db
+/images/
 
 # vim
 

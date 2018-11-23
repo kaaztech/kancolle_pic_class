@@ -80,7 +80,7 @@ class ImageDownloader(object):
         print("ImageDownloader.download")
         url_orig = '%s:orig' % url
         filename = url.split('/')[-1]
-        savepath = IMAGES_DIR + filename
+        savepath = self.image_directory + filename
         try:
             response = urllib.request.urlopen(url_orig)
             with open(savepath, "wb") as f:
