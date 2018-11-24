@@ -16,8 +16,8 @@ ACCESS_TOKEN_KEY    = os.environ.get('TWITTER_ACCESS_TOKEN_KEY')
 ACCESS_TOKEN_SECRET = os.environ.get('TWITTER_ACCESS_TOKEN_SECRET')
 
 #= Search Key Word
-#HASHTAG_BASE = '#艦これ版深夜の真剣お絵描き60分一本勝負'
-HASHTAG_BASE = '#艦これ版深夜の真剣お絵描き60分一本勝負_20180101'
+MAIN_HASHTAG = '#艦これ版深夜の真剣お絵描き60分一本勝負'
+SUB_HASHTAG  = '#艦これ版真剣お絵描き60分一本勝負'
 
 #= 検索オプション
 RETURN_PAR_PAGE = 1000
@@ -26,16 +26,16 @@ NUMBER_OF_PAGES = 100
 class ImageDownloader(object):
     date            = ''
     image_directory = IMAGES_DIR
-    hashtag         = ''
+    search_hashtag  = ''
 
-    def __init__(self, date, image_directory, hashtag):
+    def __init__(self, date, image_directory, search_hashtag):
         print("ImageDownloader.__init__()")
         super(ImageDownloader, self).__init__()
         self.set_twitter_api()
         self.media_url_list  = []
         self.date            = date
         self.image_directory = image_directory
-        self.hashtag         = hashtag
+        self.search_hashtag  = search_hashtag
         self.make_directory()
 
     def make_directory(self):
@@ -47,7 +47,7 @@ class ImageDownloader(object):
         self.max_id = None
         for page in range(NUMBER_OF_PAGES):
             self.download_url_list = []
-            self.search(self.hashtag, RETURN_PAR_PAGE)
+            self.search(self.search_hashtag, RETURN_PAR_PAGE)
             for url in self.download_url_list:
                 print(url)
                 self.download(url)
@@ -106,10 +106,9 @@ def main():
     args = parser.parse_args()
 
     try:
-        #hashtag = HASHTAG_BASE + '_' + args.date
-        hashtag = HASHTAG_BASE
+        search_hashtag  = SUB_HASHTAG + '_' + args.date
         image_directory = IMAGES_DIR + args.date + '/'
-        downloader = ImageDownloader(args.date, image_directory, hashtag)
+        downloader = ImageDownloader(args.date, image_directory, search_hashtag)
         downloader.run()
     except KeyboardInterrupt:
         pass
