@@ -103,35 +103,98 @@ def output_csv(onedrawthema_data_temp):
         writer.writerows(onedrawthema_data_temp)
 
 def output_db(onedrawthema_data_temp, args):
+    print(args.web)
+
+    if args.web == 'false':
+        output_db_local(onedrawthema_data_temp, args)
+    else:
+        output_db_web(onedrawthema_data_temp, args)
+
+def output_db_local(onedrawthema_data_temp, args):
+    print("output_db_local()")
+
     # DBアクセスの前処理
     conn = sqlite3.connect(db_file_name)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
     try:
-        #test logic
-        #cur.execute("drop table if exists dailythema")
+        # clean up logic
+        if args.clean != 'false':
+            cur.execute("drop table if exists dailythema")
 
         # shiplist.db内にshiplistテーブルが存在しない場合は生成する  
         sql_str = 'create table if not exists dailythema(date string primary key, themacount integer, shipname1 string, shipname2 string, shipname3 string, shipname4 string);'
         cur.execute(sql_str)
 
         for onedrawthema in onedrawthema_data_temp:
-            print(onedrawthema)
+            if args.debug != 'false':
+                print(onedrawthema)
             # テーマテーブルを参照し、日付が一致するレコードを取得する
             sql_str = "select * from dailythema where date = '" + onedrawthema[0] + "';"
-            print(sql_str)
+            if args.debug != 'false':
+                print(sql_str)
             is_record_exist = False
             for row in cur.execute(sql_str):
-                print(row)
+                if args.debug != 'false':
+                    print(row)
                 is_record_exist = True
                 break
             if is_record_exist:
-                print("レコードあり")
+                if args.debug != 'false':
+                    print("レコードあり")
             else:
-                print("レコードなし")
+                if args.debug != 'false':
+                    print("レコードなし")
                 sql_str = "insert into dailythema VALUES ('" + onedrawthema[0] + "'," + str(onedrawthema[1]) + "," + "'" + onedrawthema[2] + "'" + "," + "'" + onedrawthema[3] + "'" + "," + "'" + onedrawthema[4] + "'" + "," + "'" + onedrawthema[5] + "');"
+                if args.debug != 'false':
+                    print(sql_str)
+                cur.execute(sql_str)
+    finally:
+        # DBアクセスの後処理
+        conn.commit()
+        cur.close()
+        conn.close()
+
+def output_db_web(onedrawthema_data_temp, args):
+    print("output_db_web()")
+
+    # DBアクセスの前処理
+    conn = sqlite3.connect(db_file_name)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    try:
+        # clean up logic
+        if args.clean != 'false':
+            cur.execute("drop table if exists dailythema")
+
+        # shiplist.db内にshiplistテーブルが存在しない場合は生成する
+        sql_str = 'create table if not exists dailythema(date string primary key, themacount integer, shipname1 string, shipname2 string, shipname3 string, shipname4 string);'
+        cur.execute(sql_str)
+
+        for onedrawthema in onedrawthema_data_temp:
+            if args.debug != 'false':
+                print(onedrawthema)
+            # テーマテーブルを参照し、日付が一致するレコードを取得する
+            sql_str = "select * from dailythema where date = '" + onedrawthema[0] + "';"
+            if args.debug != 'false':
                 print(sql_str)
+            is_record_exist = False
+            for row in cur.execute(sql_str):
+                if args.debug != 'false':
+                    print(row)
+                is_record_exist = True
+                break
+            if is_record_exist:
+                if args.debug != 'false':
+                    print("レコードあり")
+            else:
+                if args.debug != 'false':
+                    print("レコードなし")
+                sql_str = "insert into dailythema VALUES ('" + onedrawthema[0] + "'," + str(onedrawthema[1]) + "," + "'" + onedrawthema[2] + "'" + "," + "'" + onedrawthema[3] + "'" + "," + "'" + onedrawthema[4] + "'" + "," + "'" + onedrawthema[5] + "');"
+                if args.debug != 'false':
+                    print(sql_str)
                 cur.execute(sql_str)
     finally:
         # DBアクセスの後処理
