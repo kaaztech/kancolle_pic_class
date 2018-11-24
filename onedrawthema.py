@@ -12,6 +12,7 @@ import sqlite3
 db_file_name        = 'shiplist.db'
 temp_file_name      = 'tweets.csv'
 output_csvfile_name = 'onedrawthema.csv'
+local_db_table_name = 'dailythema'
 
 def get_tweetdata():
     #= Twitter API Key の設定
@@ -121,7 +122,7 @@ def output_db_local(onedrawthema_data_temp, args):
     try:
         # clean up logic
         if args.clean != 'false':
-            cur.execute("drop table if exists dailythema")
+            cur.execute("drop table if exists " + local_db_table_name)
 
         # shiplist.db内にshiplistテーブルが存在しない場合は生成する  
         sql_str = 'create table if not exists dailythema(date string primary key, themacount integer, shipname1 string, shipname2 string, shipname3 string, shipname4 string);'
@@ -131,7 +132,7 @@ def output_db_local(onedrawthema_data_temp, args):
             if args.debug != 'false':
                 print(onedrawthema)
             # テーマテーブルを参照し、日付が一致するレコードを取得する
-            sql_str = "select * from dailythema where date = '" + onedrawthema[0] + "';"
+            sql_str = "select * from " + local_db_table_name + " where date = '" + onedrawthema[0] + "';"
             if args.debug != 'false':
                 print(sql_str)
             is_record_exist = False
@@ -146,7 +147,7 @@ def output_db_local(onedrawthema_data_temp, args):
             else:
                 if args.debug != 'false':
                     print("レコードなし")
-                sql_str = "insert into dailythema VALUES ('" + onedrawthema[0] + "'," + str(onedrawthema[1]) + "," + "'" + onedrawthema[2] + "'" + "," + "'" + onedrawthema[3] + "'" + "," + "'" + onedrawthema[4] + "'" + "," + "'" + onedrawthema[5] + "');"
+                sql_str = "insert into " + local_db_table_name + " VALUES ('" + onedrawthema[0] + "'," + str(onedrawthema[1]) + "," + "'" + onedrawthema[2] + "'" + "," + "'" + onedrawthema[3] + "'" + "," + "'" + onedrawthema[4] + "'" + "," + "'" + onedrawthema[5] + "');"
                 if args.debug != 'false':
                     print(sql_str)
                 cur.execute(sql_str)
@@ -167,7 +168,7 @@ def output_db_web(onedrawthema_data_temp, args):
     try:
         # clean up logic
         if args.clean != 'false':
-            cur.execute("drop table if exists dailythema")
+            cur.execute("drop table if exists " + local_db_table_name)
 
         # shiplist.db内にshiplistテーブルが存在しない場合は生成する
         sql_str = 'create table if not exists dailythema(date string primary key, themacount integer, shipname1 string, shipname2 string, shipname3 string, shipname4 string);'
@@ -177,7 +178,7 @@ def output_db_web(onedrawthema_data_temp, args):
             if args.debug != 'false':
                 print(onedrawthema)
             # テーマテーブルを参照し、日付が一致するレコードを取得する
-            sql_str = "select * from dailythema where date = '" + onedrawthema[0] + "';"
+            sql_str = "select * from " + local_db_table_name + " where date = '" + onedrawthema[0] + "';"
             if args.debug != 'false':
                 print(sql_str)
             is_record_exist = False
@@ -192,7 +193,7 @@ def output_db_web(onedrawthema_data_temp, args):
             else:
                 if args.debug != 'false':
                     print("レコードなし")
-                sql_str = "insert into dailythema VALUES ('" + onedrawthema[0] + "'," + str(onedrawthema[1]) + "," + "'" + onedrawthema[2] + "'" + "," + "'" + onedrawthema[3] + "'" + "," + "'" + onedrawthema[4] + "'" + "," + "'" + onedrawthema[5] + "');"
+                sql_str = "insert into " + local_db_table_name + " VALUES ('" + onedrawthema[0] + "'," + str(onedrawthema[1]) + "," + "'" + onedrawthema[2] + "'" + "," + "'" + onedrawthema[3] + "'" + "," + "'" + onedrawthema[4] + "'" + "," + "'" + onedrawthema[5] + "');"
                 if args.debug != 'false':
                     print(sql_str)
                 cur.execute(sql_str)

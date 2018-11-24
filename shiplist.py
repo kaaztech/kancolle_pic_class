@@ -11,6 +11,7 @@ import sqlite3
 
 db_file_name         = 'shiplist.db'
 output_csv_file_name = 'shiplist.csv'
+local_db_table_name  = 'shiplist'
 
 def get_wikidata(args):
     # Wikiからhtmlファイルを取得する
@@ -52,7 +53,7 @@ def output_db(args, shiplist_data_temp):
     try:
         # test logic
         if (args.clean == 'true'):
-            cur.execute("drop table if exists shiplist")
+            cur.execute("drop table if exists " + local_db_table_name)
 
         # shiplist.db内にshiplistテーブルが存在しない場合は生成する  
         sql_str = 'create table if not exists shiplist(shipno integer primary key, shipname string);'
@@ -69,7 +70,7 @@ def output_db(args, shiplist_data_temp):
             # 艦船番号が一致するレコードが存在しないと仮定する
             is_record_exist = False
             # 艦船リストテーブルを参照し、艦船番号が一致するレコードを取得する
-            sql_str = "select * from shiplist where shipno = " + str(shipno) + ";"
+            sql_str = "select * from " + local_db_table_name + " where shipno = " + str(shipno) + ";"
             if (args.debug == 'true'):
                 print(sql_str)
             for row in cur.execute(sql_str):
@@ -82,14 +83,14 @@ def output_db(args, shiplist_data_temp):
             if is_record_exist:
                 if (args.debug == 'true'):
                     print("レコードあり")
-                sql_str = "update shiplist set shipname = '" + shipdata[1] + "' where shipno = " + str(shipno) + ";"
+                sql_str = "update " + local_db_table_name + " set shipname = '" + shipdata[1] + "' where shipno = " + str(shipno) + ";"
                 if (args.debug == 'true'):
                     print(sql_str)
                 cur.execute(sql_str)
             else:
                 if (args.debug == 'true'):
                     print("レコードなし")
-                sql_str = "insert into shiplist VALUES (" + str(shipno) + "," + "'" + shipdata[1] + "');"
+                sql_str = "insert into " + local_db_table_name + " VALUES (" + str(shipno) + "," + "'" + shipdata[1] + "');"
                 if (args.debug == 'true'):
                     print(sql_str)
                 cur.execute(sql_str)
@@ -106,6 +107,8 @@ def main():
                         help='debug switch')
     parser.add_argument('--clean', type=str, default='false',
                         help='clean switch')
+    parser.add_argument('--web',   type=str, default='false',
+                        help='web switch')
     args = parser.parse_args()
 
     try:
