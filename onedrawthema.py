@@ -9,8 +9,8 @@ import csv
 import re
 import sqlite3
 
-db_file_name = 'shiplist.db'
-temp_file_name   = 'tweets.csv'
+db_file_name        = 'shiplist.db'
+temp_file_name      = 'tweets.csv'
 output_csvfile_name = 'onedrawthema.csv'
 
 def get_tweetdata():
@@ -67,7 +67,7 @@ def parse_tweetdata():
                         tweet_msg1 = re.sub('"',                                                                     '',  tweet_msg1)
                         tweet_msg1 = re.sub('"',                                                                     '',  tweet_msg1)
                         tweet_msg1 = re.sub('\u3000',                                                                " ", tweet_msg1)
-                        tweet_msg1 = re.sub(' #',                                                                    "#", tweet_msg1)                       
+                        tweet_msg1 = re.sub(' #',                                                                    "#", tweet_msg1)
                         # #で区切ることにより、テーマ告知、メインハッシュタグ、日毎ハッシュタグを分離する
                         tweet_msg2 = tweet_msg1.split("#")
                         # テーマ告知箇所をスペースで区切ることで、艦名を取り出せるようにする
@@ -102,7 +102,7 @@ def output_csv(onedrawthema_data_temp):
         writer.writerow(["date","count", "ship1","ship2","ship3","ship4"])
         writer.writerows(onedrawthema_data_temp)
 
-def output_db(onedrawthema_data_temp):
+def output_db(onedrawthema_data_temp, args):
     # DBアクセスの前処理
     conn = sqlite3.connect(db_file_name)
     conn.row_factory = sqlite3.Row
@@ -134,12 +134,22 @@ def output_db(onedrawthema_data_temp):
                 print(sql_str)
                 cur.execute(sql_str)
     finally:
-        # DBアクセスの後処理    
+        # DBアクセスの後処理
         conn.commit()
         cur.close()
         conn.close()
 
 def main():
+    parser = argparse.ArgumentParser(
+                        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--debug', type=str, default='false',
+                        help='debug switch')
+    parser.add_argument('--clean', type=str, default='false',
+                        help='clean switch')
+    parser.add_argument('--web',   type=str, default='false',
+                        help='web switch')
+    args = parser.parse_args()
+
     try:
         print("phase1: ツイート取得")
         get_tweetdata()
@@ -148,7 +158,7 @@ def main():
         print("phase3: CSVファイル出力")
         output_csv(onedrawthema_data)
         print("phase4: DBファイル出力")
-        output_db(onedrawthema_data)
+        output_db(onedrawthema_data, args)
         print("完了しました")
         sys.exit(0)
     except KeyboardInterrupt:
