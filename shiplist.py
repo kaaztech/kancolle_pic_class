@@ -9,9 +9,11 @@ import requests
 from bs4 import BeautifulSoup
 import sqlite3
 
-db_file_name         = 'shiplist.db'
 output_csv_file_name = 'shiplist.csv'
+local_db_file_name   = 'shiplist.db'
 local_db_table_name  = 'shiplist'
+web_db_file_name     = './web/shiplist.db'
+web_db_table_name    = 'manager_shiplist'
 
 def get_wikidata(args):
     # Wikiからhtmlファイルを取得する
@@ -45,8 +47,17 @@ def output_csv(args, shiplist_data_temp):
         writer.writerows(shiplist_data_temp)
 
 def output_db(args, shiplist_data_temp):
+    print(args.web)
+
+    if args.web == 'false':
+        output_db_local(args, shiplist_data_temp)
+    else:
+        output_db_web(args, shiplist_data_temp)
+
+def output_db_local(args, shiplist_data_temp):
     # DBアクセスの前処理
-    conn = sqlite3.connect(db_file_name)
+    conn = sqlite3.connect(local_db_file_name)
+
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -56,7 +67,7 @@ def output_db(args, shiplist_data_temp):
             cur.execute("drop table if exists " + local_db_table_name)
 
         # shiplist.db内にshiplistテーブルが存在しない場合は生成する  
-        sql_str = 'create table if not exists shiplist(shipno integer primary key, shipname string);'
+        sql_str = 'create table if not exists ' + local_db_table_name + '(shipno integer primary key, shipname string);'
         cur.execute(sql_str)
 
         # test logic
@@ -96,6 +107,62 @@ def output_db(args, shiplist_data_temp):
                 cur.execute(sql_str)
     finally:
         # DBアクセスの後処理    
+        conn.commit()
+        cur.close()
+        conn.close()
+
+def output_db_web(args, shiplist_data_temp):
+    # DBアクセスの前処理
+    conn = sqlite3.connect(web_db_file_name)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    try:
+        # test logic
+        if (args.clean == 'true'):
+            cur.execute("drop table if exists " + web_db_table_name)
+
+        # shiplist.db内にshiplistテーブルが存在しない場合は生成する
+        sql_str = 'create table if not exists ' + web_db_table_name + ' (shipno integer primary key, shipname string);'
+        cur.execute(sql_str)
+
+        # test logic
+        if (args.debug == 'true'):
+            sql_str = 'select * from sqlite_master;'
+            for row in cur.execute(sql_str):
+                print(row)
+
+        for shipdata in shiplist_data_temp:
+            shipno = int(shipdata[0])
+            # 艦船番号が一致するレコードが存在しないと仮定する
+            is_record_exist = False
+            # 艦船リストテーブルを参照し、艦船番号が一致するレコードを取得する
+            sql_str = "select * from " + web_db_table_name + " where shipno = " + str(shipno) + ";"
+            if (args.debug == 'true'):
+                print(sql_str)
+            for row in cur.execute(sql_str):
+                if (args.debug == 'true'):
+                    print(row)
+                # 艦船番号が一致するレコードが存在する
+                is_record_exist = True
+                break
+            # 艦船番号が一致するレコードが存在するか？
+            if is_record_exist:
+                if (args.debug == 'true'):
+                    print("レコードあり")
+                sql_str = "update " + web_db_table_name + " set shipname = '" + shipdata[1] + "' where shipno = " + str(shipno) + ";"
+                if (args.debug == 'true'):
+                    print(sql_str)
+                cur.execute(sql_str)
+            else:
+                if (args.debug == 'true'):
+                    print("レコードなし")
+                sql_str = "insert into " + web_db_table_name + " VALUES (" + str(shipno) + "," + "'" + shipdata[1] + "');"
+                if (args.debug == 'true'):
+                    print(sql_str)
+                cur.execute(sql_str)
+    finally:
+        # DBアクセスの後処理
         conn.commit()
         cur.close()
         conn.close()
