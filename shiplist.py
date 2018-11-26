@@ -10,9 +10,11 @@ from bs4 import BeautifulSoup
 import sqlite3
 
 output_csv_file_name = 'shiplist.csv'
+
 local_db_file_name   = 'shiplist.db'
 local_db_table_name  = 'shiplist'
-web_db_file_name     = './web/shiplist.db'
+
+web_db_file_name     = './web/db.sqlite3'
 web_db_table_name    = 'manager_shiplist'
 
 def get_wikidata(args):
@@ -47,8 +49,6 @@ def output_csv(args, shiplist_data_temp):
         writer.writerows(shiplist_data_temp)
 
 def output_db(args, shiplist_data_temp):
-    print(args.web)
-
     if args.web == 'false':
         output_db_local(args, shiplist_data_temp)
     else:
@@ -101,7 +101,7 @@ def output_db_local(args, shiplist_data_temp):
             else:
                 if (args.debug == 'true'):
                     print("レコードなし")
-                sql_str = "insert into " + local_db_table_name + " VALUES (" + str(shipno) + "," + "'" + shipdata[1] + "');"
+                sql_str = "insert into " + local_db_table_name + "(shipno, shipname) VALUES (" + str(shipno) + "," + "'" + shipdata[1] + "');"
                 if (args.debug == 'true'):
                     print(sql_str)
                 cur.execute(sql_str)
@@ -123,7 +123,7 @@ def output_db_web(args, shiplist_data_temp):
             cur.execute("drop table if exists " + web_db_table_name)
 
         # shiplist.db内にshiplistテーブルが存在しない場合は生成する
-        sql_str = 'create table if not exists ' + web_db_table_name + ' (shipno integer primary key, shipname string);'
+        sql_str = 'create table if not exists ' + web_db_table_name + '("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "shipno" integer NOT NULL, "shipname" varchar(256) NOT NULL);'
         cur.execute(sql_str)
 
         # test logic
@@ -137,7 +137,7 @@ def output_db_web(args, shiplist_data_temp):
             # 艦船番号が一致するレコードが存在しないと仮定する
             is_record_exist = False
             # 艦船リストテーブルを参照し、艦船番号が一致するレコードを取得する
-            sql_str = "select * from " + web_db_table_name + " where shipno = " + str(shipno) + ";"
+            sql_str = "select shipno, shipname from " + web_db_table_name + " where shipno = " + str(shipno) + ";"
             if (args.debug == 'true'):
                 print(sql_str)
             for row in cur.execute(sql_str):
@@ -157,7 +157,7 @@ def output_db_web(args, shiplist_data_temp):
             else:
                 if (args.debug == 'true'):
                     print("レコードなし")
-                sql_str = "insert into " + web_db_table_name + " VALUES (" + str(shipno) + "," + "'" + shipdata[1] + "');"
+                sql_str = "insert into " + web_db_table_name + "(shipno, shipname) VALUES (" + str(shipno) + "," + "'" + shipdata[1] + "');"
                 if (args.debug == 'true'):
                     print(sql_str)
                 cur.execute(sql_str)
