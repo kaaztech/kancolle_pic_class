@@ -174,7 +174,7 @@ def main():
                         help='debug switch')
     parser.add_argument('--clean', type=str, default='false',
                         help='clean switch')
-    parser.add_argument('--web',   type=str, default='false',
+    parser.add_argument('--web',   type=str, default='true',
                         help='web switch')
     args = parser.parse_args()
 

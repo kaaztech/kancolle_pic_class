@@ -22,7 +22,7 @@ class ShipListAdmin(admin.ModelAdmin):
 
 class DailyThema(models.Model):
 	# 日付
-	date         = models.DateTimeField()
+	date         = models.CharField(max_length=8)
 	# テーマ艦船数
 	themacount   = models.IntegerField()
 	# 艦船番号１
